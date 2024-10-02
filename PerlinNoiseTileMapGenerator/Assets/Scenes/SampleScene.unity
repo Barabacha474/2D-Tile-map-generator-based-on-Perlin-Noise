@@ -257,11 +257,11 @@ MonoBehaviour:
   GridWidth: 200
   Seed: 4
   magnification: 20
-  x_offset: 86
+  x_offset: 0
   y_offset: 0
-  MathFUsagePercantage: 0.9
-  Persistance: 3
-  Octaves: 5
+  MathFUsagePercantage: 0.5
+  Persistance: 1
+  Octaves: 1
 --- !u!4 &1531941797
 Transform:
   m_ObjectHideFlags: 0
