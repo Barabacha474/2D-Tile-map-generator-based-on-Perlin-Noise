@@ -7,10 +7,18 @@ using UnityEngine.Serialization;
 public class PerlinNoiseTileMapGeneration : MonoBehaviour
 {
 
-    [SerializeField] private List<GameObject> Tileset;
-    [SerializeField] private int GridHeight;
-    [SerializeField] private int GridWidth;
+    [SerializeField] private List<Tile> Tileset;
+    [System.Serializable]
+    public class Tile
+    {
+        public GameObject tile;
+        public float reward;
+    }
+    [SerializeField] public int GridHeight; 
+    [SerializeField] public int GridWidth;
     private List<List<GameObject>> Grid;
+    private List<List<int>> TileTypes;
+    private List<List<float>> TileRewards;
 
     [SerializeField] private int Seed = 100;
     [SerializeField]
@@ -33,24 +41,36 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
         InitiateGrids();
         GenerateMap();
+        VisualizeGrid();
     }
 
     void InitiateGrids()
     {
-        Random.InitState(Seed); 
-        
+        Random.InitState(Seed);
+
         Grid = new List<List<GameObject>>();
+        TileTypes = new List<List<int>>();
+        TileRewards = new List<List<float>>();
         for (int i = 0; i < GridHeight; i++)
         {
             Grid.Add(new List<GameObject>());
+            TileTypes.Add(new List<int>());
+            TileRewards.Add(new List<float>());
+            for (int j = 0; j < GridWidth; j++)
+            {
+                TileTypes[i].Add(0);
+                TileRewards[i].Add(0);
+            }
         }
         
         permutation = new int[GridHeight * GridWidth];
         
         // Permutations used to gradient vector creation of perlin noise
         FillPermutation(Seed);
+        
     }
 
     void GenerateMap()
@@ -60,18 +80,51 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
             for (int j = 0; j < GridWidth; j++)
             {
                 int id = GetTileType(i, j); //get's id between 0 and Tileset.count-1
-                GameObject TileType = Tileset[id];
+
+
+                TileTypes[i][j] = id;
+                TileRewards[i][j] = Tileset[id].reward;
+            }
+        }
+    }
+
+    void GenerateObstacles()
+    {
+        var StringTileTypes = "";
+        var StringTileRewards = "";
+
+        for (int i = 0; i < GridHeight; i++)
+        {
+            for (int j = 0; j < GridWidth; j++)
+            {
+                StringTileTypes += TileTypes[i][j] + " ";
+
+                StringTileRewards += TileRewards[i][j] + " ";
+            }
+            StringTileTypes += "\n";
+
+            StringTileRewards += "\n";
+        }
+
+        Debug.Log(StringTileTypes);
+        Debug.Log(StringTileRewards);
+    }
+
+    void VisualizeGrid()
+    {
+        for (int i = 0; i < GridHeight; i++)
+        {
+            for (int j = 0; j < GridWidth; j++)
+            {
+                GameObject TileType = Tileset[TileTypes[i][j]].tile;
                 Grid[i].Add(Instantiate(TileType, new Vector3(i - GridHeight / 2, j - GridWidth / 2, 0), Quaternion.identity));//Generates map in center of coordinates
                 Grid[i][j].transform.parent = gameObject.transform;//just for objects organization
             }
         }
     }
 
-    //Gets coordinates, returns id for Tileset
-    int GetTileType(float x, float y)
+    public float GetPerlinNoiseValue(float x, float y)
     {
-        int output;
-
         if (magnification == 0f) //to prevent 0 division
         {
             magnification = 1f;
@@ -103,6 +156,17 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
 
         //Scale it to the number of Tile type in Typeset
         perlinValue *= Tileset.Count;
+
+        return perlinValue;
+
+    }
+    
+    //Gets coordinates, returns id for Tileset
+    int GetTileType(float x, float y)
+    {
+        int output;
+
+        float perlinValue = GetPerlinNoiseValue(x, y);
         
         //Turn to id
         output = Mathf.FloorToInt(perlinValue);
@@ -112,12 +176,12 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
         {
             output = 0;
         }
-        
+
         if (output > Tileset.Count - 1)
         {
             output = Tileset.Count - 1;
         }
-        
+
         return output;
     }
     
@@ -222,5 +286,15 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
         }
 
         return total / maxValue;
+    }
+
+    public List<List<int>> getTileTypes()
+    {
+        return TileTypes;
+    }
+
+    public List<List<float>> getTileRewards()
+    {
+        return TileRewards;
     }
 }

@@ -184,7 +184,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 50
+  orthographic size: 80
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -245,21 +245,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Tileset:
-  - {fileID: 4565842608241346172, guid: 550f5f8215634f24fa0c5da6ce4af3e8, type: 3}
-  - {fileID: 7715273487860240035, guid: 427b5a2e6dbe191438843d709cee0869, type: 3}
-  - {fileID: 4247058368536445543, guid: 24d2ab0679e1c294183755d50399f26a, type: 3}
-  - {fileID: 3310713554213736891, guid: 525eaa65bc031f64f9d08d8e61c05587, type: 3}
-  - {fileID: 8608239769307023949, guid: ea9471fbb08b30f4094be7007097e548, type: 3}
-  - {fileID: 5684013045313643257, guid: 8dac934cad2e0c248968a07e4f8b0df9, type: 3}
-  - {fileID: 6675587163907129752, guid: f341d0d373304304586db37f06248962, type: 3}
-  - {fileID: 1467805278958201466, guid: 975b7ffbfb3a44e4fbaf2171c2155dfd, type: 3}
-  GridHeight: 200
-  GridWidth: 200
+  - tile: {fileID: 4565842608241346172, guid: 550f5f8215634f24fa0c5da6ce4af3e8, type: 3}
+    reward: -5
+  - tile: {fileID: 7715273487860240035, guid: 427b5a2e6dbe191438843d709cee0869, type: 3}
+    reward: -3
+  - tile: {fileID: 4247058368536445543, guid: 24d2ab0679e1c294183755d50399f26a, type: 3}
+    reward: -1
+  - tile: {fileID: 3310713554213736891, guid: 525eaa65bc031f64f9d08d8e61c05587, type: 3}
+    reward: 0
+  - tile: {fileID: 8608239769307023949, guid: ea9471fbb08b30f4094be7007097e548, type: 3}
+    reward: -2
+  - tile: {fileID: 5684013045313643257, guid: 8dac934cad2e0c248968a07e4f8b0df9, type: 3}
+    reward: -3
+  - tile: {fileID: 6675587163907129752, guid: f341d0d373304304586db37f06248962, type: 3}
+    reward: -4
+  - tile: {fileID: 1467805278958201466, guid: 975b7ffbfb3a44e4fbaf2171c2155dfd, type: 3}
+    reward: -5
+  GridHeight: 150
+  GridWidth: 150
   Seed: 4
   magnification: 20
   x_offset: 0
   y_offset: 0
-  MathFUsagePercantage: 0.5
+  MathFUsagePercantage: 0.9
   Persistance: 1
   Octaves: 1
 --- !u!4 &1531941797
