@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -13,6 +14,11 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
     {
         public GameObject tile;
         public float reward;
+    }
+    public class Obstacle
+    {
+        public GameObject obstacle;
+        public float reward_modification;
     }
     [SerializeField] public int GridHeight; 
     [SerializeField] public int GridWidth;
@@ -35,7 +41,11 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
     [SerializeField]private float Persistance = 1;
     [Range(1, 100)]
     [SerializeField] private int Octaves = 1;
-    
+
+    [SerializeField] private bool Visualize = true;
+    [SerializeField] private bool Generate_obstacles = true;
+    [SerializeField] private bool PrintOutputs = true;
+
     private int[] permutation;
     
     // Start is called before the first frame update
@@ -44,7 +54,18 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
         
         InitiateGrids();
         GenerateMap();
-        VisualizeGrid();
+        if (Generate_obstacles)
+        {
+            GenerateObstacles();
+        }
+        if (Visualize)
+        {
+            VisualizeGrid();
+        }
+        if (PrintOutputs)
+        {
+            PrintOutput();
+        }
     }
 
     void InitiateGrids()
@@ -89,6 +110,11 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
     }
 
     void GenerateObstacles()
+    {
+        
+    }
+
+    void PrintOutput()
     {
         var StringTileTypes = "";
         var StringTileRewards = "";
