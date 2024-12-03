@@ -274,7 +274,6 @@ MonoBehaviour:
   GridHeight: 150
   GridWidth: 150
   MapSeed: 100
-  ObstaclesSeed: 100
   magnification: 20
   x_offset: 0
   y_offset: 0
@@ -283,7 +282,8 @@ MonoBehaviour:
   Octaves: 1
   Visualize: 1
   Generate_obstacles: 1
-  PrintOutputs: 0
+  PrintOutputs: 1
+  ObstaclesSeed: 100
   NumberOfRoads: 50
   NewRoadPointMaxRange: 30
   NewRoadPointMinRange: 15
