@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEditor.ShaderKeywordFilter;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 public class PerlinNoiseTileMapGeneration : MonoBehaviour
 {
-
+    [Header("Sets")]
     [SerializeField] private List<Tile> Tileset;
     [System.Serializable]
     public class Tile
@@ -15,18 +16,24 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
         public GameObject tile;
         public float reward;
     }
+
+    [SerializeField] private List<Obstacle> ObstaclesSet;
+    [System.Serializable]
     public class Obstacle
     {
         public GameObject obstacle;
         public float reward_modification;
+        public List<int> SpawnOnTileTypeIndexes;
     }
+    [Header("Map")]
     [SerializeField] public int GridHeight; 
     [SerializeField] public int GridWidth;
     private List<List<GameObject>> Grid;
     private List<List<int>> TileTypes;
     private List<List<float>> TileRewards;
 
-    [SerializeField] private int Seed = 100;
+    [SerializeField] private int MapSeed = 100;
+    
     [SerializeField]
     private float magnification = 7f;
     [SerializeField]
@@ -45,6 +52,13 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
     [SerializeField] private bool Visualize = true;
     [SerializeField] private bool Generate_obstacles = true;
     [SerializeField] private bool PrintOutputs = true;
+
+    [Header("Obstacles")]
+    [SerializeField] private int ObstaclesSeed = 100;
+    [SerializeField] private int NumberOfRoads = 5;
+    [SerializeField] private float NewRoadPointMaxRange = 20;
+    [SerializeField] private float NewRoadPointMinRange = 10;
+    [SerializeField] private int NumberOfBuildings = 10;
 
     private int[] permutation;
     
@@ -70,7 +84,7 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
 
     void InitiateGrids()
     {
-        Random.InitState(Seed);
+        Random.InitState(MapSeed);
 
         Grid = new List<List<GameObject>>();
         TileTypes = new List<List<int>>();
@@ -90,7 +104,7 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
         permutation = new int[GridHeight * GridWidth];
         
         // Permutations used to gradient vector creation of perlin noise
-        FillPermutation(Seed);
+        FillPermutation(MapSeed);
         
     }
 
@@ -111,7 +125,132 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
 
     void GenerateObstacles()
     {
+        Random.InitState(ObstaclesSeed);
+        List<Vector2Int> roadPoints = GenerateRoadAndBridgePoints();
         
+        GenerateBuildings(roadPoints);
+    }
+
+    List<Vector2Int> GenerateRoadAndBridgePoints()
+    {
+        List<Vector2Int> roadPoints = new List<Vector2Int>();
+        Vector2Int startPoint = new Vector2Int(GridHeight + 1, GridWidth + 1);
+        Vector2Int endPoint = new Vector2Int(GridHeight + 1, GridWidth + 1);
+        for (int r = 0; r < NumberOfRoads; r++)
+        {
+            while (!IsValidRoadTile(startPoint))
+            {
+                startPoint = new Vector2Int(Random.Range(0, GridHeight), Random.Range(0, GridWidth));
+            }
+
+
+            while ((!IsValidRoadTile(endPoint) || startPoint == endPoint)
+                || (Vector2.Distance(startPoint, endPoint) < NewRoadPointMinRange || Vector2.Distance(startPoint, endPoint) > NewRoadPointMaxRange))
+            {
+                endPoint = new Vector2Int(Random.Range(0, GridHeight), Random.Range(0, GridWidth));
+            }
+
+            List<Vector2Int> path = ConnectPointsWithRoadAndBridges(startPoint, endPoint);
+            roadPoints.AddRange(path);
+
+            startPoint = endPoint;
+        }
+        return roadPoints;
+    }
+
+    void GenerateBuildings(List<Vector2Int> roadPoints)
+    {
+        for (int b = 0; b < NumberOfBuildings; b++)
+        {
+            Vector2Int nearRoad;
+            do
+            {
+                nearRoad = roadPoints[Random.Range(0, roadPoints.Count)];
+                nearRoad += new Vector2Int(Random.Range(1, 5), Random.Range(1, 5));
+            } while (!IsValidBuildingTile(nearRoad));
+
+            int size = Random.Range(1, 3);
+            PlaceBuilding(nearRoad, size);
+        }
+    }
+
+    List<Vector2Int> ConnectPointsWithRoadAndBridges(Vector2Int start, Vector2Int end)
+    {
+        List<Vector2Int> path = new List<Vector2Int>();
+        Vector2 current = start;
+        var cur_position = Vector2Int.RoundToInt(current);
+        while (Vector2Int.RoundToInt(current) != end)
+        {
+            cur_position = Vector2Int.RoundToInt(current);
+            path.Add(cur_position);
+            if (IsValidRoadTile(cur_position))
+            {
+                PlaceObstacle(cur_position, 0); // Assuming 0 is the road obstacle index
+            } else if (IsValidBridgeTile(cur_position)) {
+                PlaceObstacle(cur_position, 1); // Assuming 1 is the bridge obstacle index
+            }
+            
+            current = Vector2.MoveTowards(current, end, 1);
+        }
+        path.Add(end);
+        PlaceObstacle(end, 0);
+        return path;
+    }
+
+    void PlaceBuilding(Vector2Int center, int size)
+    {
+        for (int dx = -size; dx <= size; dx++)
+        {
+            for (int dy = -size; dy <= size; dy++)
+            {
+                Vector2Int pos = new Vector2Int(center.x + dx, center.y + dy);
+                if (IsValidBuildingTile(pos))
+                {
+                    PlaceObstacle(pos, 2); // Assuming 2 is the building obstacle index
+                }
+            }
+        }
+    }
+
+    void PlaceObstacle(Vector2Int position, int obstacleIndex)
+    {
+        if (IsInBounds(position))
+        {
+            TileTypes[position.x][position.y] = Tileset.Count + obstacleIndex;
+            TileRewards[position.x][position.y] += ObstaclesSet[obstacleIndex].reward_modification;
+        }
+    }
+
+    bool IsValidRoadTile(Vector2Int position)
+    {
+        return IsInBounds(position) && (TileTypes[position.x][position.y] >= ObstaclesSet[0].SpawnOnTileTypeIndexes[0] // Assuming 0 is the road obstacle index
+                                    && TileTypes[position.x][position.y] <= ObstaclesSet[0].SpawnOnTileTypeIndexes[ObstaclesSet[0].SpawnOnTileTypeIndexes.Count - 1]
+                                    || TileTypes[position.x][position.y] == Tileset.Count + 0);
+    }
+
+    bool IsValidBridgeTile(Vector2Int position)
+    {
+        return IsInBounds(position) && (TileTypes[position.x][position.y] >= ObstaclesSet[1].SpawnOnTileTypeIndexes[0] // Assuming 1 is the bridge obstacle index
+                                    && TileTypes[position.x][position.y] <= ObstaclesSet[1].SpawnOnTileTypeIndexes[ObstaclesSet[1].SpawnOnTileTypeIndexes.Count - 1]
+                                    || TileTypes[position.x][position.y] == Tileset.Count + 1);
+    }
+
+    bool IsValidBuildingTile(Vector2Int position)
+    {
+        return IsInBounds(position) && (TileTypes[position.x][position.y] >= ObstaclesSet[2].SpawnOnTileTypeIndexes[0] // Assuming 2 is the building obstacle index
+                                    && TileTypes[position.x][position.y] <= ObstaclesSet[2].SpawnOnTileTypeIndexes[ObstaclesSet[2].SpawnOnTileTypeIndexes.Count - 1]
+                                    || TileTypes[position.x][position.y] == Tileset.Count + 2)
+                                    && !IsRoadOrBridge(position);
+    }
+
+    bool IsRoadOrBridge(Vector2Int position)
+    {
+        return TileTypes[position.x][position.y] >= Tileset.Count && TileTypes[position.x][position.y] <= Tileset.Count + 1;
+    }
+
+    bool IsInBounds(Vector2Int position)
+    {
+        return position.x >= 0 && position.x < GridHeight && position.y >= 0 && position.y < GridWidth;
     }
 
     void PrintOutput()
@@ -142,7 +281,16 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
         {
             for (int j = 0; j < GridWidth; j++)
             {
-                GameObject TileType = Tileset[TileTypes[i][j]].tile;
+                var TileTypeID = TileTypes[i][j];
+                GameObject TileType;
+                if (TileTypeID < Tileset.Count)
+                {
+                    TileType = Tileset[TileTypeID].tile;
+                }
+                else
+                {
+                    TileType = ObstaclesSet[TileTypeID - Tileset.Count].obstacle;
+                }        
                 Grid[i].Add(Instantiate(TileType, new Vector3(i - GridHeight / 2, j - GridWidth / 2, 0), Quaternion.identity));//Generates map in center of coordinates
                 Grid[i][j].transform.parent = gameObject.transform;//just for objects organization
             }

@@ -261,15 +261,33 @@ MonoBehaviour:
     reward: -4
   - tile: {fileID: 1467805278958201466, guid: 975b7ffbfb3a44e4fbaf2171c2155dfd, type: 3}
     reward: -5
+  ObstaclesSet:
+  - obstacle: {fileID: 7715273487860240035, guid: 4f75e7cec88031a409ef273864cb270c, type: 3}
+    reward_modification: 0.5
+    SpawnOnTileTypeIndexes: 03000000040000000500000006000000
+  - obstacle: {fileID: 7715273487860240035, guid: 16c480394d46f5648bde3a05a039b4c6, type: 3}
+    reward_modification: 1
+    SpawnOnTileTypeIndexes: 000000000100000002000000
+  - obstacle: {fileID: 7715273487860240035, guid: 6ef6addc016d3b042a6e96a69f8f1a50, type: 3}
+    reward_modification: -0.5
+    SpawnOnTileTypeIndexes: 03000000040000000500000006000000
   GridHeight: 150
   GridWidth: 150
-  Seed: 4
+  MapSeed: 100
+  ObstaclesSeed: 100
   magnification: 20
   x_offset: 0
   y_offset: 0
   MathFUsagePercantage: 0.9
   Persistance: 1
   Octaves: 1
+  Visualize: 1
+  Generate_obstacles: 1
+  PrintOutputs: 0
+  NumberOfRoads: 50
+  NewRoadPointMaxRange: 30
+  NewRoadPointMinRange: 15
+  NumberOfBuildings: 15
 --- !u!4 &1531941797
 Transform:
   m_ObjectHideFlags: 0
