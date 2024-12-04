@@ -80,6 +80,8 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
         {
             PrintOutput();
         }
+
+        GetComponent<Pathfinder>().Init();
     }
 
     void InitiateGrids()
