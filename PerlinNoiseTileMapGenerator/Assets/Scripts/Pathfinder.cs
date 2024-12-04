@@ -77,16 +77,35 @@ public class Pathfinder : MonoBehaviour
                 else
                 {
                     action = GetBestAction(currentPosition);
+
+                    // Add noise if oscillation is likely
+                    if (visitedPositions.Contains(currentPosition + action))
+                    {
+                        Debug.Log("Applying random noise to break potential oscillation.");
+                        action = directions[Random.Range(0, directions.Count)];
+                    }
                 }
+
 
                 Vector2Int nextPosition = currentPosition + action;
 
                 if (IsPositionValid(nextPosition))
                 {
                     float reward = rewards[nextPosition.x][nextPosition.y];
+                    if (visitedPositions.Contains(nextPosition))
+                    {
+                        reward -= 1.0f; // Apply a penalty for revisiting
+                    }
+
                     float maxFutureQ = GetMaxQValue(nextPosition);
                     qValues[currentPosition.x][currentPosition.y] += learningRate *
                         (reward + discountFactor * maxFutureQ - qValues[currentPosition.x][currentPosition.y]);
+
+                    if (steps > maxStepsPerEpisode / 2)
+                    {
+                        explorationRate = Mathf.Clamp(explorationRate + 0.1f, 0.2f, 0.5f); // Temporarily increase
+                    }
+
 
                     currentPosition = nextPosition;
                 }
@@ -94,10 +113,11 @@ public class Pathfinder : MonoBehaviour
 
             if (steps >= maxStepsPerEpisode)
             {
-                Debug.LogWarning($"Reached max steps for iteration {iteration}, stopping episode.");
+                Debug.LogWarning($"Reached max steps for iteration {iteration}.");
             }
         }
     }
+
 
 
 
@@ -127,33 +147,38 @@ public class Pathfinder : MonoBehaviour
     {
         List<Vector2Int> path = new List<Vector2Int>();
         Vector2Int currentPosition = startPosition;
-        HashSet<Vector2Int> visitedPositions = new HashSet<Vector2Int>();
-        int maxPathLength = gridWidth * gridHeight;
+        Queue<Vector2Int> recentPositions = new Queue<Vector2Int>();
+        int cycleLength = 4;
 
         while (currentPosition != goalPosition)
         {
             Debug.Log($"Current Position: {currentPosition}, Path Length: {path.Count}");
 
-            if (path.Count > maxPathLength)
-            {
-                Debug.LogError("Pathfinding failed: Exceeded maximum path length.");
-                return new List<Vector2Int>();
-            }
 
-            if (visitedPositions.Contains(currentPosition))
-            {
-                // Debug.LogError("Pathfinding failed: Encountered a cycle.");
-                // return new List<Vector2Int>();
-            }
 
-            visitedPositions.Add(currentPosition);
+            if (recentPositions.Count == cycleLength)
+            {
+                recentPositions.Dequeue();
+            }
+            recentPositions.Enqueue(currentPosition);
+
             path.Add(currentPosition);
 
-            currentPosition += GetBestAction(currentPosition);
+            Vector2Int nextAction = GetBestAction(currentPosition);
+
+            // Add noise if oscillation is likely
+            if (recentPositions.Contains(currentPosition + nextAction))
+            {
+                Debug.Log("Applying random noise to break potential oscillation.");
+                nextAction = directions[Random.Range(0, directions.Count)];
+            }
+
+            currentPosition += nextAction;
+
 
             if (!IsPositionValid(currentPosition))
             {
-                Debug.LogError("Pathfinding failed: Reached an invalid position.");
+                Debug.LogError("Reached an invalid position.");
                 return new List<Vector2Int>();
             }
         }
@@ -161,6 +186,7 @@ public class Pathfinder : MonoBehaviour
         path.Add(goalPosition);
         return path;
     }
+
 
 
 
