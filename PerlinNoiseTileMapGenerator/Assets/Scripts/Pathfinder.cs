@@ -13,6 +13,7 @@ public class Pathfinder : MonoBehaviour
     [SerializeField] private int maxStepsPerEpisode = 500;
     [SerializeField] private int maxRetries = 3;
     [SerializeField] private int maxStepsForPathfinding = 1000;
+    private PathVisualization pathVisualization;
 
     private List<List<float>> rewards;
     private List<List<float>> qValues;
@@ -143,6 +144,7 @@ public class Pathfinder : MonoBehaviour
             foreach (var step in path)
             {
                 Debug.Log($"Step: {step}");
+                pathVisualization.DrawPixel(step);
             }
 
             Debug.LogWarning($"Pathfinding attempt {retryCount} failed. Retrying...");
