@@ -74,6 +74,7 @@ public class Pathfinder : MonoBehaviour
 
             while (currentPosition != goalPosition && steps < maxStepsPerEpisode)
             {
+                float reward = 0;
                 steps++;
                 visitedPositions.Add(currentPosition);
 
@@ -89,7 +90,7 @@ public class Pathfinder : MonoBehaviour
                     // Add noise if oscillation is likely
                     if (visitedPositions.Contains(currentPosition + action))
                     {
-                        // Debug.Log("Applying random noise to break potential oscillation.");
+                        reward -= 0.5f; // Stronger penalty for revisits
                         action = directions[Random.Range(0, directions.Count)];
                     }
                 }
@@ -99,7 +100,9 @@ public class Pathfinder : MonoBehaviour
 
                 if (IsPositionValid(nextPosition))
                 {
-                    float reward = rewards[nextPosition.x][nextPosition.y];
+                    float distancePenalty = Vector2Int.Distance(nextPosition, goalPosition) * 0.1f; // Add penalty based on distance
+                    reward += rewards[nextPosition.x][nextPosition.y] - distancePenalty;
+
                     if (visitedPositions.Contains(nextPosition))
                     {
                         reward -= 0.1f; // Apply a penalty for revisiting
