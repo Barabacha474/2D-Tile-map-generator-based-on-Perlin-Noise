@@ -39,10 +39,6 @@ public class Pathfinder : MonoBehaviour
         TrainAgent();
 
         List<Vector2Int> bestPath = FindBestPath();
-        foreach (var step in bestPath)
-        {
-            Debug.Log($"Step: {step}");
-        }
     }
 
     private void InitializeQValues()
@@ -133,11 +129,22 @@ public class Pathfinder : MonoBehaviour
 
             if (isReached)
             {
+                foreach (var step in path)
+                {
+                    Debug.Log($"Step: {step}");
+                }
+
                 Debug.Log($"Pathfinding succeeded after {retryCount + 1} attempt(s).");
                 return path;
             }
 
             retryCount++;
+
+            foreach (var step in path)
+            {
+                Debug.Log($"Step: {step}");
+            }
+
             Debug.LogWarning($"Pathfinding attempt {retryCount} failed. Retrying...");
         }
 
