@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class Pathfinder : MonoBehaviour
@@ -13,6 +14,7 @@ public class Pathfinder : MonoBehaviour
     [SerializeField] private int maxStepsPerEpisode = 500;
     [SerializeField] private int maxRetries = 3;
     [SerializeField] private int maxStepsForPathfinding = 1000;
+    [SerializeField] private List<Vector2Int> lastBadPath;
     public PathVisualization pathVisualization;
 
     private List<List<float>> rewards;
@@ -25,7 +27,11 @@ public class Pathfinder : MonoBehaviour
         new Vector2Int(0, 1),  // Up
         new Vector2Int(0, -1), // Down
         new Vector2Int(1, 0),  // Right
-        new Vector2Int(-1, 0)  // Left
+        new Vector2Int(-1, 0),  // Left
+        new Vector2Int(1, 1),  // Right-Up
+        new Vector2Int(-1, 1), // Left-Up
+        new Vector2Int(1, -1),  // Right-Down
+        new Vector2Int(-1, -1)  // Left-Down
     };
 
     public void Init()
@@ -133,6 +139,7 @@ public class Pathfinder : MonoBehaviour
                 foreach (var step in path)
                 {
                     Debug.Log($"Step: {step}");
+                    pathVisualization.DrawPixel(step);
                 }
 
                 Debug.Log($"Pathfinding succeeded after {retryCount + 1} attempt(s).");
@@ -144,12 +151,17 @@ public class Pathfinder : MonoBehaviour
             foreach (var step in path)
             {
                 Debug.Log($"Step: {step}");
-                pathVisualization.DrawPixel(step);
             }
 
             Debug.LogWarning($"Pathfinding attempt {retryCount} failed. Retrying...");
+            lastBadPath = path;
         }
 
+        foreach (var step in lastBadPath)
+        {
+            Debug.Log($"Step: {step}");
+            pathVisualization.DrawPixel(step);
+        }
         Debug.LogError("Pathfinding failed after maximum retries.");
         return new List<Vector2Int>();
     }

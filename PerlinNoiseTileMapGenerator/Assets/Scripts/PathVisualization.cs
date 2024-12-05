@@ -23,6 +23,8 @@ public class PathVisualization : MonoBehaviour
         if (position.x >= 0 && position.x < GridWidth && position.y >= 0 && position.y < GridHeight)
         {
             GameObject pixel = Instantiate(PixelPrefab, new Vector3(position.x - GridWidth / 2, position.y - GridHeight / 2, -1), Quaternion.identity, transform);
+            pixel.GetComponent<PathCellData>().position = position;
+
             
             var renderer = pixel.GetComponent<SpriteRenderer>();
             if (renderer != null)
