@@ -13,7 +13,7 @@ public class Pathfinder : MonoBehaviour
     [SerializeField] private int maxStepsPerEpisode = 500;
     [SerializeField] private int maxRetries = 3;
     [SerializeField] private int maxStepsForPathfinding = 1000;
-    private PathVisualization pathVisualization;
+    public PathVisualization pathVisualization;
 
     private List<List<float>> rewards;
     private List<List<float>> qValues;

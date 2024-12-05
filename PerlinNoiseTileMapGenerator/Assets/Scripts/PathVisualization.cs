@@ -21,7 +21,7 @@ public class PathVisualization : MonoBehaviour
         if (position.x >= 0 && position.x < GridWidth && position.y >= 0 && position.y < GridHeight)
         {
             // Instantiate a red pixel at the specified position
-            GameObject pixel = Instantiate(PixelPrefab, new Vector3(position.x - GridWidth / 2, position.y - GridHeight / 2, 1), Quaternion.identity);
+            GameObject pixel = Instantiate(PixelPrefab, new Vector3(position.x - GridWidth / 2, position.y - GridHeight / 2, -1), Quaternion.identity);
             
             // Set the pixel color to red
             var renderer = pixel.GetComponent<SpriteRenderer>();
