@@ -14,7 +14,8 @@ public class Pathfinder : MonoBehaviour
     [SerializeField] private int maxStepsPerEpisode = 500;
     [SerializeField] private int maxRetries = 3;
     [SerializeField] private int maxStepsForPathfinding = 1000;
-    [SerializeField] private List<Vector2Int> lastBadPath;
+
+    private List<Vector2Int> lastBadPath;
     public PathVisualization pathVisualization;
 
     private List<List<float>> rewards;
@@ -40,6 +41,8 @@ public class Pathfinder : MonoBehaviour
         rewards = mapGenerator.getTileRewards();
         gridHeight = rewards.Count;
         gridWidth = rewards[0].Count;
+
+        rewards[goalPosition.x][goalPosition.y] += 10f;
 
         InitializeQValues();
 
@@ -99,22 +102,19 @@ public class Pathfinder : MonoBehaviour
                     float reward = rewards[nextPosition.x][nextPosition.y];
                     if (visitedPositions.Contains(nextPosition))
                     {
-                        reward -= 1.0f; // Apply a penalty for revisiting
+                        reward -= 0.1f; // Apply a penalty for revisiting
                     }
 
                     float maxFutureQ = GetMaxQValue(nextPosition);
                     qValues[currentPosition.x][currentPosition.y] += learningRate *
                         (reward + discountFactor * maxFutureQ - qValues[currentPosition.x][currentPosition.y]);
 
-                    if (steps > maxStepsPerEpisode / 2)
-                    {
-                        explorationRate = Mathf.Clamp(explorationRate + 0.1f, 0.2f, 0.5f); // Temporarily increase
-                    }
-
 
                     currentPosition = nextPosition;
                 }
             }
+
+            explorationRate = Mathf.Max(0.1f, explorationRate * 0.99f);
 
             if (steps >= maxStepsPerEpisode)
             {
@@ -223,7 +223,7 @@ public class Pathfinder : MonoBehaviour
 
     private Vector2Int GetBestAction(Vector2Int position)
     {
-        Vector2Int bestAction = directions[0];
+        Vector2Int bestAction = Vector2Int.zero;
         float bestQValue = float.MinValue;
 
         foreach (var direction in directions)
@@ -232,10 +232,25 @@ public class Pathfinder : MonoBehaviour
             if (IsPositionValid(nextPosition))
             {
                 float qValue = qValues[nextPosition.x][nextPosition.y];
+                float heuristic = Vector2Int.Distance(nextPosition, goalPosition);
+                qValue -= heuristic * 0.1f;
+
                 if (qValue > bestQValue)
                 {
                     bestQValue = qValue;
                     bestAction = direction;
+                }
+            }
+        }
+
+        if (bestAction == Vector2Int.zero)
+        {
+            foreach (var direction in directions)
+            {
+                Vector2Int fallbackPosition = position + direction;
+                if (IsPositionValid(fallbackPosition))
+                {
+                    return direction;
                 }
             }
         }

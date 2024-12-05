@@ -363,15 +363,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 493b39a2cd9ce854aba7459c092a8959, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPosition: {x: 50, y: 50}
-  goalPosition: {x: 90, y: 90}
+  startPosition: {x: 0, y: 0}
+  goalPosition: {x: 70, y: 90}
   learningRate: 0.5
-  discountFactor: 0.9
+  discountFactor: 0.95
   maxIterations: 10000
-  explorationRate: 0.8
-  maxStepsPerEpisode: 25000
-  maxRetries: 1
-  maxStepsForPathfinding: 10
+  explorationRate: 0.9
+  maxStepsPerEpisode: 10000
+  maxRetries: 4
+  maxStepsForPathfinding: 10000
   pathVisualization: {fileID: 698979418}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
