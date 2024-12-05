@@ -132,6 +132,7 @@ public class Pathfinder : MonoBehaviour
     private List<Vector2Int> FindBestPath()
     {
         int retryCount = 0;
+        float totalReward = 0;
 
         while (retryCount < maxRetries)
         {
@@ -143,9 +144,12 @@ public class Pathfinder : MonoBehaviour
                 {
                     Debug.Log($"Step: {step}");
                     pathVisualization.DrawPixel(step);
+
+                    totalReward += rewards[step.x][step.y];
                 }
 
                 Debug.Log($"Pathfinding succeeded after {retryCount + 1} attempt(s).");
+                Debug.Log($"Total Reward of the Path: {totalReward}");
                 return path;
             }
 
@@ -164,8 +168,11 @@ public class Pathfinder : MonoBehaviour
         {
             Debug.Log($"Step: {step}");
             pathVisualization.DrawPixel(step);
+
+            totalReward += rewards[step.x][step.y];
         }
         Debug.LogError("Pathfinding failed after maximum retries.");
+        Debug.Log($"Total Reward of the Last Attempt: {totalReward}");
         return new List<Vector2Int>();
     }
 
