@@ -316,14 +316,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 493b39a2cd9ce854aba7459c092a8959, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startPosition: {x: 30, y: 30}
-  goalPosition: {x: 120, y: 120}
-  learningRate: 0.2
+  startPosition: {x: 50, y: 50}
+  goalPosition: {x: 90, y: 90}
+  learningRate: 0.5
   discountFactor: 0.9
   maxIterations: 10000
-  explorationRate: 0.4
-  maxStepsPerEpisode: 10000
-  maxRetries: 3
+  explorationRate: 0.6
+  maxStepsPerEpisode: 25000
+  maxRetries: 1
+  maxStepsForPathfinding: 500
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
