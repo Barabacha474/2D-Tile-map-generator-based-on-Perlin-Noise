@@ -114,7 +114,7 @@ public class Pathfinder : MonoBehaviour
                 }
             }
 
-            explorationRate = Mathf.Max(0.1f, explorationRate * 0.99f);
+            // explorationRate = Mathf.Max(0.1f, explorationRate * 0.99f);
 
             if (steps >= maxStepsPerEpisode)
             {
