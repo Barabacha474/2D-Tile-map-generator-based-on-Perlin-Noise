@@ -8,6 +8,8 @@ using UnityEngine.Serialization;
 
 public class PerlinNoiseTileMapGeneration : MonoBehaviour
 {
+    [SerializeField] private bool isRandom;
+
     [Header("Sets")]
     [SerializeField] private List<Tile> Tileset;
     [System.Serializable]
@@ -81,7 +83,14 @@ public class PerlinNoiseTileMapGeneration : MonoBehaviour
             PrintOutput();
         }
 
-        GetComponent<Pathfinder>().Init();
+        if (!isRandom)
+        {
+            GetComponent<Pathfinder>().Init();
+        }
+        else
+        {
+            GetComponent<PathRandom>().Init();
+        }
     }
 
     void InitiateGrids()

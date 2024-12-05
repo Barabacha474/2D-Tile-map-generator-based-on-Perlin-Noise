@@ -273,6 +273,7 @@ GameObject:
   - component: {fileID: 1531941797}
   - component: {fileID: 1531941796}
   - component: {fileID: 1531941798}
+  - component: {fileID: 1531941799}
   m_Layer: 0
   m_Name: TileMap
   m_TagString: Untagged
@@ -292,6 +293,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa51d5cd948ce414d865d8b2fd4d0d33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isRandom: 0
   Tileset:
   - tile: {fileID: 4565842608241346172, guid: 550f5f8215634f24fa0c5da6ce4af3e8, type: 3}
     reward: -5
@@ -372,6 +374,22 @@ MonoBehaviour:
   maxStepsPerEpisode: 22500
   maxRetries: 4
   maxStepsForPathfinding: 10000
+  pathVisualization: {fileID: 698979418}
+--- !u!114 &1531941799
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1531941795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d8ff35ff9287b84991c66ab3e00d13e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startPosition: {x: 5, y: 5}
+  goalPosition: {x: 145, y: 145}
+  maxSteps: 70000
   pathVisualization: {fileID: 698979418}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
