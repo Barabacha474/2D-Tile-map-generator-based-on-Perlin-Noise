@@ -245,8 +245,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PixelPosition: {x: 0, y: 0}
-  GridWidth: 150
-  GridHeight: 150
+  color: {r: 1, g: 0, b: 0, a: 1}
   PixelPrefab: {fileID: 1467805278958201466, guid: 1e534f522f7d69d4c9df93f47e3a70d2, type: 3}
 --- !u!4 &698979419
 Transform:
